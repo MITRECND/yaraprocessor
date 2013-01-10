@@ -36,7 +36,8 @@ Simply clone the repository via git:
 
     $ git clone https://github.com/MITRECND/yaraprocessor.git
 
-Or download the latest release from our github page.
+Or download the latest release from our `github page
+<https://github.com/MITRECND/yaraprocessor/archive/master.zip>`_.
 
 Once you have the code, run the following command inside the
 Yaraprocessor directory:
