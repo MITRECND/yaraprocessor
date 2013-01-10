@@ -34,7 +34,7 @@ Simply clone the repository via git:
 
 .. code-block:: bash
 
-    $ git clone https://github.com/Locker537/yaraprocessor.git
+    $ git clone https://github.com/MITRECND/yaraprocessor.git
 
 Or download the latest release from our github page.
 
