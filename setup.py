@@ -38,7 +38,8 @@ setup(
     author='Stephen DiCato',
     author_email='sdicato@mitre.org',
     url='https://github.com/MITRECND/yaraprocessor',
-    packages=['yaraprocessor'],
+    # For a single file, use 'py_modules' instead of 'packages'
+    py_modules=['yaraprocessor'],
     zip_safe=False,
     classifiers=(
         'Development Status :: 5 - Production/Stable',
