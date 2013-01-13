@@ -57,7 +57,7 @@ analyzing data.
 
 .. code-block:: python
 
-    import yaraprocessor
+    from yaraprocessor import Processor
 
     # Yara rules are passed as a list of filenames
     p = Processor(['/full/path/to/rules, relative/path/to/other/rules'])
