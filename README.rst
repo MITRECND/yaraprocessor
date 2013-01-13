@@ -12,7 +12,7 @@ streams in few unique ways. It supports scanning data streams in discrete
 chunks, or buffers. These chunks can overlap or be completely disjoint
 depending on the 'processing_mode' selected.
 
-Yaraprocessor was originally written for 
+Yaraprocessor was originally written for
 `Chopshop <https://github.com/MITRECND/chopshop>`_. Combined with Chopshop, it
 allows for dynamic scanning of payloads plucked from network packet capture.
 Historically, signature based tools operate over the entire PCAP file. With
@@ -45,3 +45,47 @@ Yaraprocessor directory:
 .. code-block:: bash
 
     $ python setup.py install
+
+Using it!
+---------
+
+While yaraprocessor was built for use with
+`Chopshop <https://github.com/MITRECND/chopshop>`_, it aims for simple
+and straightforward usage and integration with other tools. Simply
+import yaraprocessor, instantiate a "Processor" object, and start
+analyzing data.
+
+.. code-block:: python
+
+    import yaraprocessor
+
+    # Yara rules are passed as a list of filenames
+    p = Processor(['/full/path/to/rules, relative/path/to/other/rules'])
+
+    # By default, the processor will operate in 'raw' mode, meaning it
+    # will scan whatever data you give it. Note that in 'raw' mode, you
+    # are required to call 'analyze', which will return yara matches if
+    # found.
+    p.data = data
+    results = p.analyze()
+
+    # 'analyze' returns yara matches and also stores them in 'p.results'
+    # for convenient access.
+    if p.results:
+        for match in p.results:
+            print match
+
+    # When operating in other processing modes, data will be continuously
+    # buffered and automatically processed when the buffer fills. In these
+    # modes, you don't have to ever call 'p.analyze'; instead simply check
+    # for results.
+
+    if p.results:
+        for match in p.results:
+            print match
+
+Contributing
+------------
+
+We love to hear from people using our tools and code. Feel free to discuss
+issues on our `issue tracker <https://github.com/MITRECND/yaraprocessor/issues>`_ and make pull requests!
