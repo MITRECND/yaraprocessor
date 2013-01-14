@@ -18,7 +18,7 @@ allows for dynamic scanning of payloads plucked from network packet capture.
 Historically, signature based tools operate over the entire PCAP file. With
 Chopshop and Yaraprocessor, YARA can be ran against individual packet payloads
 as well as a concatenation of some or all of the payloads. Ideally, this makes
-writting signatures easier. Check out the Chopshop module `yarashop
+writing signatures easier. Check out the Chopshop module `yarashop
 <https://github.com/MITRECND/chopshop/blob/master/modules/yarashop.py>`_ to see it in action!
 
 Dependencies
