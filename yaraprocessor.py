@@ -189,9 +189,6 @@ class Processor(object):
         if not data:
             data = self.data
 
-        self.logger.debug('Analyzing: %s' % data)
-        self.logger.debug('Offset: %s' % self._offset)
-
         for r in self._rules.match(data=data):
             result = {'result': r.rule,
                       'strings': [],
