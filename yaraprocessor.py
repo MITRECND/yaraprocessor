@@ -48,7 +48,8 @@ class Processor(object):
     A wrapper to Yara.
     """
 
-    def __init__(self, rule_files, processing_mode='raw', **kwargs):
+    def __init__(self, rule_files, processing_mode='raw',
+                 compiled=False, **kwargs):
         """
         Default initializer.
 
@@ -59,6 +60,8 @@ class Processor(object):
         processing_mode -- (String) Mode used in processing data. Allowed
                            options include; fixed_buffer, sliding_window,
                            and raw. Default is raw mode.
+
+        compiled -- (Boolean) If True, treat the provided rule file as compiled.
 
         Optional arguments:
         "fixed_buffer" processing mode:
@@ -96,14 +99,36 @@ class Processor(object):
             else:
                 raise IOError((errno.ENOENT, 'Cannot find file.', f))
 
-        self._rule_files = self._prepare_rules(rule_files)
+        if not compiled:
+            self._rule_files = self._prepare_rules(rule_files)
 
-        # Try to load the rules into yara
-        try:
-            self._rules = yara.compile(filepaths=self._rule_files)
+            # Try to load the rules into yara
+            try:
+                self._rules = yara.compile(filepaths=self._rule_files)
+            except yara.SyntaxError as e:
+                err = ('Rule syntax error. If using compiled rules, you must '
+                       'pass the "compiled" argument. Original error: %s' % e)
+                raise ProcessorException(err)
+            except yara.Error:
+                raise
 
-        except yara.Error:
-            raise
+        else:  # rules are compiled
+            try:
+                # yara.load only accepts a single file
+                assert(len(rule_files) == 1)
+            except AssertionError:
+                err = ('Compiled rules must be compiled to one file. Loading '
+                       'from compiled rules does not support multiple rule files.')
+                raise ProcessorException(err)
+
+            self._rule_files = rule_files[0]
+
+            try:
+                self._rules = yara.load(self._rule_files)
+            except yara.Error as e:
+                err = ('Generic error loading compiled rules. '
+                       'Original error: %s' % e)
+                raise ProcessorException(err)
 
         # Validate that the processing mode is supported
         self._allowed_modes = ['raw', 'fixed_buffer', 'sliding_window']
@@ -300,7 +325,7 @@ if __name__ == '__main__':
         '--mode',
         choices=['raw', 'fixed_buffer', 'sliding_window'],
         default='raw',
-        help='Set the operating mode for yara.')
+        help='Set the operating mode for yara. Default is "raw".')
 
     parser.add_argument(
         '--input',
@@ -314,6 +339,13 @@ if __name__ == '__main__':
         nargs='*',
         required=True,
         help='Rule files for use in Yara.')
+
+    parser.add_argument(
+        '--compiled',
+        action='store_true',
+        help='Treat provided rule file as compiled. Note, all rules must \
+              be compiled to a single file.'
+    )
 
     parser.add_argument(
         '--size',
@@ -331,17 +363,25 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data = args.input.read()
 
+    logger.debug('Building Processor with rules:')
+    for i, each in enumerate(args.rules):
+        logger.debug('    %i) %s' % (i, each))
+
+    if args.compiled:
+        logger.debug('Treating rule file as compiled.')
+
     logger.debug('Operating in %s mode.' % args.mode)
     if args.mode != 'raw':
         logger.debug('Buffer/Window size is %s' % args.size)
         logger.debug('Window step is %s' % args.step)
 
         p = Processor(args.rules, processing_mode=args.mode,
-                      buffer_size=args.size, window_step=args.step)
+                      compiled=args.compiled, buffer_size=args.size,
+                      window_step=args.step)
         p.data += data
 
     else:
-        p = Processor(args.rules)
+        p = Processor(args.rules, compiled=args.compiled)
         p.data += data
         results = p.analyze()
 
