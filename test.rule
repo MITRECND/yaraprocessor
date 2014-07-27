@@ -1,0 +1,8 @@
+rule simple
+{
+    strings:
+        $a = "dirty"
+
+    condition:
+        $a
+}
