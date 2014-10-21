@@ -31,7 +31,7 @@ LONG_DESCRIPTION = open('README.rst').read()
 
 setup(
     name='yaraprocessor',
-    version='1.0.0',
+    version='1.1.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     license=open('LICENSE').read(),
